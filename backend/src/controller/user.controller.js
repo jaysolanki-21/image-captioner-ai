@@ -33,8 +33,40 @@ const register = async (req, res) => {
     }
 };
 
+// Login
+const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await usermodel.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
+        res.status(200).json({ message: "Login successful" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 
 
 module.exports = {
     register,
+    login
 };
