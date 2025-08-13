@@ -1,0 +1,36 @@
+const postModel = require("../models/post.model");
+const generateCaption = require("../service/ai.service")
+const { uploadImage } = require("../service/storage.service");
+const uuid = require("uuid");
+const {imagekit} = require("../service/storage.service");
+async function createPostController(req, res) {
+    try {
+        const file = req.file;
+        const user = req.user._id;
+        if (!file) {
+            return res.status(400).json({ error: "Image file is required" });
+        }
+        const base64Image = Buffer.from(file.buffer).toString('base64');
+        const uploaded = await uploadImage(base64Image, uuid.v4());
+        const caption = await generateCaption(base64Image);
+
+        const post = await postModel.create({
+            image: uploaded.url,
+            caption,
+            user,
+            fileId : uploaded.fileId
+        });
+
+        res.status(201).json({ post });
+    } catch (err) {
+        console.error("Create post error:", err);
+        res.status(500).json({ error: "Something went wrong" });
+    }
+}
+
+
+
+
+module.exports = {
+    createPostController,
+}
