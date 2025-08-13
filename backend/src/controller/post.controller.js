@@ -28,9 +28,27 @@ async function createPostController(req, res) {
     }
 }
 
+async function myPosts(req, res) {
+    try {
+        const user = req.user._id;
+        const posts = await postModel.find({ user }).lean(); 
 
+        const formattedPosts = posts.map(post => ({
+            ...post,
+            createdAt: new Date(post.createdAt).toLocaleString("en-IN", {
+                timeZone: "Asia/Kolkata"
+            })
+        }));
+
+        res.status(200).json({ posts: formattedPosts });
+    } catch (err) {
+        console.error("My posts error:", err);
+        res.status(500).json({ error: "Something went wrong" });
+    }
+}
 
 
 module.exports = {
     createPostController,
+    myPosts
 }

@@ -10,4 +10,9 @@ router.post('/',
     createPostController
 )
 
+router.get('/my-posts',
+    authMiddleware,
+    myPosts
+)
+
 module.exports = router;
