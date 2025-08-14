@@ -47,8 +47,35 @@ async function myPosts(req, res) {
     }
 }
 
+async function deletePostController(req, res) {
+    try {
+        const postId = req.params.id;
+        const post = await postModel.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        if (post.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ error: "Unauthorized" });
+        }
+
+        if (post.fileId) {
+            await imagekit.deleteFile(post.fileId); // make sure post.fileId is the ImageKit file ID
+        }
+
+        await postModel.findByIdAndDelete(postId);
+        res.status(200).json({ message: "Post deleted successfully" });
+
+    } catch (err) {
+        console.error("Delete post error:", err);
+        res.status(500).json({ error: "Something went wrong" });
+    }
+}
+
 
 module.exports = {
     createPostController,
-    myPosts
+    myPosts,
+    deletePostController
 }
