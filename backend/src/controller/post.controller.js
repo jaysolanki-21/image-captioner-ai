@@ -47,6 +47,7 @@ async function myPosts(req, res) {
     }
 }
 
+
 async function deletePostController(req, res) {
     try {
         const postId = req.params.id;
@@ -61,7 +62,7 @@ async function deletePostController(req, res) {
         }
 
         if (post.fileId) {
-            await imagekit.deleteFile(post.fileId); // make sure post.fileId is the ImageKit file ID
+            await imagekit.deleteFile(post.fileId); 
         }
 
         await postModel.findByIdAndDelete(postId);
@@ -72,6 +73,7 @@ async function deletePostController(req, res) {
         res.status(500).json({ error: "Something went wrong" });
     }
 }
+
 
 
 module.exports = {
