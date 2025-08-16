@@ -8,6 +8,7 @@ This is the backend of a full-stack Image to Caption Generator application built
 
 - Node.js  
 - Express.js  
+- imagekit
 - MongoDB + Mongoose  
 - Multer (for file upload)  
 - OpenAI / HuggingFace API (for caption generation)  
